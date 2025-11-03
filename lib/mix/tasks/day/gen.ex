@@ -6,14 +6,16 @@ defmodule Mix.Tasks.Day.Gen do
 
   use Mix.Task
 
+  @year 2024
+
   @impl Mix.Task
   def run(args) do
     {:ok, _} = Application.ensure_all_started(:hackney)
 
     case OptionParser.parse!(args, strict: []) do
       {_opts, [day, name]} ->
-        file_name =
-          "lib/day#{day}/#{String.split(name, ~r/(?=[A-Z])/, trim: true) |> Enum.join("_") |> String.downcase()}.ex"
+        file_name = String.split(name, ~r/(?=[A-Z])/, trim: true) |> Enum.join("_")
+        file_name = "lib/day#{day}/#{String.downcase(file_name)}.ex"
 
         module_name =
           String.split(name, ~r/(?=[A-Z])/, trim: true)
@@ -44,7 +46,7 @@ defmodule Mix.Tasks.Day.Gen do
   Downloads the puzzle input for a given day.
   """
   def download_input(day) do
-    HTTPoison.get("https://adventofcode.com/2024/day/#{day}/input", [],
+    HTTPoison.get("https://adventofcode.com/#{@year}/day/#{day}/input", [],
       hackney: [cookie: ["session=#{System.get_env("AOC_SESSION_COOKIE")}"]],
       headers: [{"User-Agent", "github.com/Boettner-eric/Advent-of-Code-2025"}]
     )
