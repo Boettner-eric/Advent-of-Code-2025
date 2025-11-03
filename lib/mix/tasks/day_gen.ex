@@ -84,10 +84,8 @@ defmodule Mix.Tasks.Day.Gen do
   end
 
   defp template_test(module_name, day_name, day) do
-    test_module_name = String.replace(day_name, " ", "") |> String.capitalize()
-
     """
-    defmodule #{test_module_name}Test do
+    defmodule #{module_name}Test do
       use ExUnit.Case
 
       test "day #{day_name}, gets correct answer for sample one" do
