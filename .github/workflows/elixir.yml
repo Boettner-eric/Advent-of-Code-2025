@@ -26,6 +26,7 @@ jobs:
         with:
           elixir-version: "1.17.4" # [Required] Define the Elixir version
           otp-version: "27.0" # [Required] Define the Erlang/OTP version
+          version-type: "strict"
       - name: Restore dependencies cache
         uses: actions/cache@v3
         with:
