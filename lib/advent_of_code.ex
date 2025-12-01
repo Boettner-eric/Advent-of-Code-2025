@@ -15,7 +15,7 @@ defmodule AdventOfCode do
   def read_lines(filename) do
     {:ok, input} = File.read(filename)
 
-    String.split(input, "\n")
+    String.split(input, "\n", trim: true)
   end
 
   @doc """

@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Day.Gen do
 
   use Mix.Task
 
-  @year 2024
+  @year 2025
 
   @impl Mix.Task
   def run(args) do
@@ -68,18 +68,15 @@ defmodule Mix.Tasks.Day.Gen do
   defp template_day(name, day) do
     """
     defmodule #{name} do
+      # https://adventofcode.com/#{@year}/day/#{day}
       def problem_one(filename \\\\ "lib/day#{day}/input.txt") do
         AdventOfCode.read_lines(filename)
         |> IO.inspect()
-
-
       end
 
       def problem_two(filename \\\\ "lib/day#{day}/input.txt") do
         AdventOfCode.read_lines(filename)
         |> IO.inspect()
-
-
       end
     end
     """
