@@ -14,6 +14,6 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 
 ## Results
 
-| Day  | Module Name | Execution time |
-|---|---|---|
-|   |   |   |
+| Day  | Module Name | Execution time | Stars |
+|---|---|---|---|
+| 1  | SecretEntrance   | 0.0134s | ⭐⭐ |

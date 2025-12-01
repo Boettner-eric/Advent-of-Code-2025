@@ -13,8 +13,10 @@ defmodule Mix.Tasks.Day.Run do
       {_opts, [day]} ->
         case find_module(day) do
           {:ok, module} ->
-            run_problem(module, :problem_one)
-            run_problem(module, :problem_two)
+            time_a = run_problem(module, :problem_one)
+            time_b = run_problem(module, :problem_two)
+
+            Mix.shell().info("Total time: #{format_seconds(time_a + time_b)} seconds")
 
           {:error, reason} ->
             Mix.shell().error("Module for #{day} not found: #{reason}")
@@ -37,10 +39,10 @@ defmodule Mix.Tasks.Day.Run do
   defp run_problem(module, function_name) do
     if function_exported?(module, function_name, 1) do
       {time_us, result} = :timer.tc(fn -> apply(module, function_name, []) end)
-      time_ms = :erlang.float_to_binary(time_us / 100_000, decimals: 2)
 
       Mix.shell().info("Running #{function_name}/1:\n\n#{inspect(result)}")
-      Mix.shell().info("\nFinished in #{time_ms} seconds\n")
+      Mix.shell().info("\nFinished in #{format_seconds(time_us)} seconds\n")
+      time_us
     else
       Mix.shell().error("Function #{function_name}/1 not found in module #{module}")
     end
@@ -78,5 +80,9 @@ defmodule Mix.Tasks.Day.Run do
       _ ->
         {:error, "Could not extract module name from file"}
     end
+  end
+
+  defp format_seconds(us) do
+    :erlang.float_to_binary(us / 100_000, decimals: 4)
   end
 end
