@@ -7,11 +7,9 @@ defmodule GiftShop do
     |> Enum.reduce(0, fn i, count ->
       [first, last] = String.split(i, "-", trim: true)
 
-      Enum.to_list(String.to_integer(first)..String.to_integer(last))
-      # remove all numbers with an odd number of digits
-      |> Enum.filter(fn e -> rem(Integer.to_charlist(e) |> length, 2) == 0 end)
-      |> Enum.reduce(0, &symmetric/2)
-      |> Kernel.+(count)
+      String.to_integer(first)..String.to_integer(last)
+      |> Enum.to_list()
+      |> Enum.reduce(count, &symmetric/2)
     end)
   end
 
@@ -22,17 +20,17 @@ defmodule GiftShop do
     |> Enum.reduce(0, fn i, count ->
       [first, last] = String.split(i, "-", trim: true)
 
-      Enum.to_list(String.to_integer(first)..String.to_integer(last))
-      |> Enum.reduce(0, &symmetric_two/2)
-      |> Kernel.+(count)
+      String.to_integer(first)..String.to_integer(last)
+      |> Enum.to_list()
+      |> Enum.reduce(count, &symmetric_two/2)
     end)
   end
 
-  def symmetric(num, matches) do
-    Integer.to_string(num)
-    |> String.split_at(div(String.length(Integer.to_string(num)), 2))
-    |> case do
-      {a, a} -> num + matches
+  def symmetric(number, matches) do
+    num = Integer.to_string(number)
+
+    case String.split_at(num, div(String.length(num), 2)) do
+      {a, a} -> number + matches
       _ -> matches
     end
   end

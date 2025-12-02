@@ -19,4 +19,4 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 | Day | Module Name    | Execution time | Stars |
 | --- | -------------- | -------------- | ----- |
 | 1   | SecretEntrance | 0.0134s        | ⭐⭐  |
-| 2   | GiftShop       | 5.7273s        | ⭐⭐  |
+| 2   | GiftShop       | 2.9177s        | ⭐⭐  |
