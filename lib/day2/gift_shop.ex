@@ -37,26 +37,27 @@ defmodule GiftShop do
     end
   end
 
-  def symmetric_two(num, matches) do
-    num = Integer.to_string(num)
+  def symmetric_two(number, matches) do
+    num = Integer.to_string(number)
+    size = String.length(num)
 
-    Enum.reduce_while(1..String.length(num), matches, fn parts, count ->
-      sub_sequence = split_string(num, parts)
-
-      if length(sub_sequence) > 1 do
-        case MapSet.size(MapSet.new(sub_sequence)) do
-          1 -> {:halt, String.to_integer(num) + count}
-          _ -> {:cont, count}
-        end
+    Enum.reduce_while(2..size, matches, fn parts, count ->
+      if size > 1 and rem(size, parts) == 0 and equal_parts(num, parts) == 1 do
+        {:halt, number + count}
       else
         {:cont, count}
       end
     end)
   end
 
-  def split_string(str, parts) do
-    String.codepoints(str)
-    |> Enum.chunk_every(parts)
-    |> Enum.map(&Enum.join/1)
+  def equal_parts(str, parts) do
+    part_length = div(String.length(str), parts)
+
+    Enum.reduce(0..(parts - 1), [], fn part, acc ->
+      offset = part * part_length
+      [String.slice(str, offset..(offset + part_length - 1)) | acc]
+    end)
+    |> MapSet.new()
+    |> MapSet.size()
   end
 end
