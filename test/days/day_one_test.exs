@@ -1,19 +1,21 @@
 defmodule SecretEntranceTest do
   use ExUnit.Case
 
-  test "day one, gets correct answer for sample one" do
-    assert SecretEntrance.problem_one("lib/day1/sample.txt") == 3
+  @tag :sample
+  test "day one, gets correct answer for part one with the sample input" do
+    assert SecretEntrance.part_one(:sample) == 3
   end
 
-  test "day one, gets correct answer for problem one" do
-    assert SecretEntrance.problem_one() == 1147
+  test "day one, gets correct answer for part one" do
+    assert SecretEntrance.part_one(:input) == 1147
   end
 
-  test "day one, gets correct answer for sample two" do
-    assert SecretEntrance.problem_two("lib/day1/sample.txt") == 6
+  @tag :sample
+  test "day one, gets correct answer for part two with the sample input" do
+    assert SecretEntrance.part_two(:sample) == 6
   end
 
-  test "day one, gets correct answer for problem two" do
-    assert SecretEntrance.problem_two() == 6789
+  test "day one, gets correct answer for part two" do
+    assert SecretEntrance.part_two(:input) == 6789
   end
 end

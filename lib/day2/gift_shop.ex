@@ -1,22 +1,22 @@
 defmodule GiftShop do
   # https://adventofcode.com/2025/day/2
-  def part_one(filename \\ "lib/day2/input.txt") do
-    AdventOfCode.read_lines(filename)
+  def part_one(input) do
+    AdventOfCode.read_lines(__DIR__, input)
     |> Enum.at(0)
     |> String.split(",", trim: true)
     |> Enum.reduce(0, fn i, count ->
       [first, last] = String.split(i, "-", trim: true)
 
       Enum.to_list(String.to_integer(first)..String.to_integer(last))
-      # remove all odd numbers
+      # remove all numbers with an odd number of digits
       |> Enum.filter(fn e -> rem(Integer.to_charlist(e) |> length, 2) == 0 end)
       |> Enum.reduce(0, &symmetric/2)
       |> Kernel.+(count)
     end)
   end
 
-  def part_two(filename \\ "lib/day2/input.txt") do
-    AdventOfCode.read_lines(filename)
+  def part_two(input) do
+    AdventOfCode.read_lines(__DIR__, input)
     |> Enum.at(0)
     |> String.split(",", trim: true)
     |> Enum.reduce(0, fn i, count ->

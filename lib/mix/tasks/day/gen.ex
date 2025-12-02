@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Day.Gen do
   @moduledoc """
-  Usage: mix day.gen <number> <problem name>
+  Usage: mix day.gen <number> <module_name | "download">
   """
   @shortdoc "Generates all the files needed for an aoc day"
 
@@ -13,6 +13,21 @@ defmodule Mix.Tasks.Day.Gen do
     {:ok, _} = Application.ensure_all_started(:hackney)
 
     case OptionParser.parse!(args, strict: []) do
+      {_opts, [day, "download"]} ->
+        if not File.exists?("lib/day#{day}/input.txt") or
+             Mix.shell().yes?("Input file already exists. Overwrite? (y/n)") do
+          case download_input(day) do
+            {:ok, input} ->
+              Mix.Generator.create_file("lib/day#{day}/input.txt", input)
+              Mix.shell().info("Input downloaded and saved to lib/day#{day}/input.txt")
+
+            {:error, reason} ->
+              Mix.shell().error("Error downloading puzzle: #{reason}")
+          end
+        else
+          Mix.shell().info("Input file already exists. Skipping download.")
+        end
+
       {_opts, [day, name]} ->
         file_name = String.split(name, ~r/(?=[A-Z])/, trim: true) |> Enum.join("_")
         file_name = "lib/day#{day}/#{String.downcase(file_name)}.ex"
@@ -31,7 +46,7 @@ defmodule Mix.Tasks.Day.Gen do
             Mix.Generator.create_file("lib/day#{day}/input.txt", input)
             Mix.Generator.create_file("lib/day#{day}/sample.txt", "")
             Mix.Generator.create_file(file_name, template_day(module_name, day))
-            Mix.Generator.create_file(test_file_name, template_test(module_name, day_name, day))
+            Mix.Generator.create_file(test_file_name, template_test(module_name, day_name))
 
           {:error, reason} ->
             Mix.shell().error("Error downloading puzzle: #{reason}")
@@ -69,38 +84,40 @@ defmodule Mix.Tasks.Day.Gen do
     """
     defmodule #{name} do
       # https://adventofcode.com/#{@year}/day/#{day}
-      def problem_one(filename \\\\ "lib/day#{day}/input.txt") do
-        AdventOfCode.read_lines(filename)
+      def part_one(input) do
+        AdventOfCode.read_lines(__DIR__, input)
         |> IO.inspect()
       end
 
-      def problem_two(filename \\\\ "lib/day#{day}/input.txt") do
-        AdventOfCode.read_lines(filename)
+      def part_two(input) do
+        AdventOfCode.read_lines(__DIR__, input)
         |> IO.inspect()
       end
     end
     """
   end
 
-  defp template_test(module_name, day_name, day) do
+  defp template_test(module_name, day_name) do
     """
     defmodule #{module_name}Test do
       use ExUnit.Case
 
-      test "day #{day_name}, gets correct answer for sample one" do
-        assert #{module_name}.problem_one("lib/day#{day}/sample.txt") == nil
+      @tag :sample
+      test "day #{day_name}, gets correct answer for part one with the sample input" do
+        assert #{module_name}.part_one(:sample) == nil
       end
 
-      test "day #{day_name}, gets correct answer for problem one" do
-        assert #{module_name}.problem_one() == nil
+      test "day #{day_name}, gets correct answer for part one" do
+        assert #{module_name}.part_one(:input) == nil
       end
 
-      test "day #{day_name}, gets correct answer for sample two" do
-        assert #{module_name}.problem_two("lib/day#{day}/sample.txt") == nil
+      @tag :sample
+      test "day #{day_name}, gets correct answer for part two with the sample input" do
+        assert #{module_name}.part_two(:sample) == nil
       end
 
-      test "day #{day_name}, gets correct answer for problem two" do
-        assert #{module_name}.problem_two() == nil
+      test "day #{day_name}, gets correct answer for part two" do
+        assert #{module_name}.part_two(:input) == nil
       end
     end
     """

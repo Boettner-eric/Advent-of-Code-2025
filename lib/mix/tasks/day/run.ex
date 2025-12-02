@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Day.Run do
   @moduledoc """
   Usage: mix day.run <number> < 1 | 2 >
-         mix day.run <number> (runs both problems)
+         mix day.run <number> (runs both parts)
   """
   @shortdoc "Run the code for a given day"
 
@@ -13,8 +13,8 @@ defmodule Mix.Tasks.Day.Run do
       {_opts, [day]} ->
         case find_module(day) do
           {:ok, module} ->
-            time_a = run_problem(module, :problem_one)
-            time_b = run_problem(module, :problem_two)
+            time_a = run_part(module, :part_one)
+            time_b = run_part(module, :part_two)
 
             Mix.shell().info("Total time: #{format_seconds(time_a + time_b)} seconds")
 
@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Day.Run do
 
       {_opts, [day, part]} when part in ["1", "2"] ->
         case find_module(day) do
-          {:ok, module} -> run_problem(module, part)
+          {:ok, module} -> run_part(module, part)
           {:error, reason} -> Mix.shell().error("Module for #{day} not found: #{reason}")
         end
 
@@ -33,12 +33,12 @@ defmodule Mix.Tasks.Day.Run do
     end
   end
 
-  defp run_problem(module, "1"), do: run_problem(module, :problem_one)
-  defp run_problem(module, "2"), do: run_problem(module, :problem_two)
+  defp run_part(module, "1"), do: run_part(module, :part_one)
+  defp run_part(module, "2"), do: run_part(module, :part_two)
 
-  defp run_problem(module, function_name) do
+  defp run_part(module, function_name) do
     if function_exported?(module, function_name, 1) do
-      {time_us, result} = :timer.tc(fn -> apply(module, function_name, []) end)
+      {time_us, result} = :timer.tc(fn -> apply(module, function_name, [:input]) end)
 
       Mix.shell().info("Running #{function_name}/1:\n\n#{inspect(result)}")
       Mix.shell().info("\nFinished in #{format_seconds(time_us)} seconds\n")

@@ -5,7 +5,7 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 ## Usage
 
 - `mix day.gen <number> <name>` will create files and tests for each challenge
-- `mix day.run <number> <part>` will get the result for that problem and log more verbosely
+- `mix day.run <number> <part>` will get the result for that part and log more verbosely
 - `mix test test/day<number>.exs` will run the tests for a given day
 
 ## Goals
