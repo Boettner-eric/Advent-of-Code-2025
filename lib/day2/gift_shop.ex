@@ -42,7 +42,7 @@ defmodule GiftShop do
     size = String.length(num)
 
     Enum.reduce_while(2..size, matches, fn parts, count ->
-      if size > 1 and rem(size, parts) == 0 and equal_parts(num, parts) == 1 do
+      if size > 1 and rem(size, parts) == 0 and equal_parts(num, parts) do
         {:halt, number + count}
       else
         {:cont, count}
@@ -53,11 +53,15 @@ defmodule GiftShop do
   def equal_parts(str, parts) do
     part_length = div(String.length(str), parts)
 
-    Enum.reduce(0..(parts - 1), [], fn part, acc ->
+    Enum.reduce_while(0..(parts - 1), nil, fn part, current ->
       offset = part * part_length
-      [String.slice(str, offset..(offset + part_length - 1)) | acc]
+      slice = String.slice(str, offset..(offset + part_length - 1))
+
+      cond do
+        is_nil(current) -> {:cont, slice}
+        current == slice -> {:cont, current}
+        true -> {:halt, false}
+      end
     end)
-    |> MapSet.new()
-    |> MapSet.size()
   end
 end
