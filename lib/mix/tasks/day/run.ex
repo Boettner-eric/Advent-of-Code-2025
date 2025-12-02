@@ -83,6 +83,6 @@ defmodule Mix.Tasks.Day.Run do
   end
 
   defp format_seconds(us) do
-    :erlang.float_to_binary(us / 100_000, decimals: 4)
+    :erlang.float_to_binary(us / 1_000_000, decimals: 4)
   end
 end
