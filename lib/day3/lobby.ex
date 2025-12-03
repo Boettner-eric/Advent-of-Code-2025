@@ -11,7 +11,7 @@ defmodule Lobby do
         Enum.slice(numbers, 0..-2//1)
         |> Enum.max()
 
-      index = Enum.find_index(numbers, fn x -> x == first_digit end)
+      index = Enum.find_index(numbers, &Kernel.==(&1, first_digit))
 
       second_digit =
         Enum.slice(numbers, (index + 1)..-1//1)
@@ -23,6 +23,25 @@ defmodule Lobby do
 
   def part_two(input) do
     AdventOfCode.read_lines(__DIR__, input)
-    |> IO.inspect()
+    |> Enum.reduce(0, fn line, count ->
+      numbers =
+        String.split(line, "", trim: true)
+        |> Enum.map(&String.to_integer/1)
+
+      Enum.reduce(12..1//-1, {count, 0}, fn digit, {count, last} ->
+        {new_digit, index} = next_digit(numbers, last, digit)
+        {new_digit * :math.pow(10, digit - 1) + count, index}
+      end)
+      |> elem(0)
+    end)
+  end
+
+  def next_digit(numbers, last, left) do
+    slice = Enum.slice(numbers, last..-left//1)
+    digit = Enum.max(slice)
+
+    index = last + Enum.find_index(slice, &Kernel.==(&1, digit))
+
+    {digit, index + 1}
   end
 end
