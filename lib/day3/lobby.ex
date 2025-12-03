@@ -7,15 +7,8 @@ defmodule Lobby do
         String.split(line, "", trim: true)
         |> Enum.map(&String.to_integer/1)
 
-      first_digit =
-        Enum.slice(numbers, 0..-2//1)
-        |> Enum.max()
-
-      index = Enum.find_index(numbers, &Kernel.==(&1, first_digit))
-
-      second_digit =
-        Enum.slice(numbers, (index + 1)..-1//1)
-        |> Enum.max()
+      {first_digit, index} = next_digit(numbers, 0, 2)
+      {second_digit, _index} = next_digit(numbers, index, 1)
 
       first_digit * 10 + second_digit + count
     end)
@@ -39,9 +32,8 @@ defmodule Lobby do
   def next_digit(numbers, last, left) do
     slice = Enum.slice(numbers, last..-left//1)
     digit = Enum.max(slice)
+    index = Enum.find_index(slice, &Kernel.==(&1, digit))
 
-    index = last + Enum.find_index(slice, &Kernel.==(&1, digit))
-
-    {digit, index + 1}
+    {digit, last + index + 1}
   end
 end
