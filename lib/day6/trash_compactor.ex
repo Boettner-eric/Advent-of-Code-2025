@@ -26,17 +26,12 @@ defmodule TrashCompactor do
 
     # move one char at a time from right to left
     Enum.reduce(width..0//-1, {0, []}, fn index, {count, numbers} ->
-      # skip empty columns
-      if Enum.all?(lines, fn l -> String.at(l, index) == " " end) do
-        {count, []}
-      else
-        numbers = [merge_digits(lines, index) | numbers]
+      numbers = merge_digits(lines, index) ++ numbers
 
-        case String.at(ops, index) do
-          "*" -> {count + Enum.reduce(numbers, 1, &Kernel.*/2), []}
-          "+" -> {count + Enum.reduce(numbers, 0, &Kernel.+/2), []}
-          _ -> {count, numbers}
-        end
+      case String.at(ops, index) do
+        "*" -> {count + Enum.reduce(numbers, 1, &Kernel.*/2), []}
+        "+" -> {count + Enum.reduce(numbers, 0, &Kernel.+/2), []}
+        _ -> {count, numbers}
       end
     end)
     |> elem(0)
@@ -46,9 +41,13 @@ defmodule TrashCompactor do
     Enum.reduce(0..(length(lines) - 1), "", fn line, bcc ->
       case String.at(Enum.at(lines, line), index) do
         " " -> bcc
+        "" -> bcc
         c -> c <> bcc
       end
     end)
-    |> String.to_integer()
+    |> case do
+      "" -> []
+      i -> [String.to_integer(i)]
+    end
   end
 end
