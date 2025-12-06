@@ -1,27 +1,28 @@
 defmodule TrashCompactor do
   # https://adventofcode.com/2025/day/6
   def part_one(input) do
-    [ops | nums] = AdventOfCode.read_lines(__DIR__, input) |> Enum.reverse()
+    [ops | lines] = AdventOfCode.read_lines(__DIR__, input) |> Enum.reverse()
     ops = String.split(ops, " ", trim: true)
+    initial = Enum.map(0..(length(ops) - 1), fn _ -> 0 end)
 
-    Enum.reduce(nums, Enum.map(0..(length(ops) - 1), fn _ -> 0 end), fn i, acc ->
-      line = String.split(i, " ", trim: true) |> Enum.map(&String.to_integer/1)
+    Enum.reduce(lines, initial, fn line, numbers ->
+      line = String.split(line, " ", trim: true) |> Enum.map(&String.to_integer/1)
 
-      Enum.reduce(0..(length(line) - 1), acc, fn j, count ->
-        val = Enum.at(line, j)
+      Enum.reduce(0..(length(line) - 1), numbers, fn j, c ->
+        v = Enum.at(line, j)
 
         case Enum.at(ops, j) do
-          "*" -> List.update_at(count, j, fn c -> if c != 0, do: c * val, else: val end)
-          "+" -> List.update_at(count, j, fn c -> c + val end)
+          "*" -> List.update_at(c, j, fn c -> if c != 0, do: c * v, else: v end)
+          "+" -> List.update_at(c, j, fn c -> c + v end)
         end
       end)
     end)
-    |> Enum.reduce(0, fn i, acc -> i + acc end)
+    |> Enum.reduce(0, fn i, numbers -> i + numbers end)
   end
 
   def part_two(input) do
     [ops | lines] = AdventOfCode.read_lines(__DIR__, input) |> Enum.reverse()
-    width = String.length(Enum.at(lines, 0)) - 1
+    width = String.length(ops) - 1
 
     # move one char at a time from right to left
     Enum.reduce(width..0//-1, {0, []}, fn index, {count, numbers} ->
@@ -29,12 +30,12 @@ defmodule TrashCompactor do
       if Enum.all?(lines, fn l -> String.at(l, index) == " " end) do
         {count, []}
       else
-        num = merge_digits(lines, index)
+        numbers = [merge_digits(lines, index) | numbers]
 
         case String.at(ops, index) do
-          "*" -> {count + Enum.reduce(numbers, 1, &Kernel.*/2) * num, []}
-          "+" -> {count + Enum.reduce(numbers, 0, &Kernel.+/2) + num, []}
-          _ -> {count, [num | numbers]}
+          "*" -> {count + Enum.reduce(numbers, 1, &Kernel.*/2), []}
+          "+" -> {count + Enum.reduce(numbers, 0, &Kernel.+/2), []}
+          _ -> {count, numbers}
         end
       end
     end)
