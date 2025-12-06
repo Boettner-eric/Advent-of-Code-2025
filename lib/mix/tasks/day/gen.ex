@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Day.Gen do
       {_opts, [day, "download"]} ->
         if not File.exists?("lib/day#{day}/input.txt") or
              Mix.shell().yes?("Input file already exists. Overwrite? (y/n)") do
-          case download_input(day) do
+          case AdventOfCode.download_input(day) do
             {:ok, input} ->
               Mix.Generator.create_file("lib/day#{day}/input.txt", input)
               Mix.shell().info("Input downloaded and saved to lib/day#{day}/input.txt")
@@ -40,7 +40,7 @@ defmodule Mix.Tasks.Day.Gen do
         day_name = num_to_name(day)
         test_file_name = "test/days/day_#{String.replace(day_name, " ", "_")}_test.exs"
 
-        case download_input(day) do
+        case AdventOfCode.download_input(day) do
           {:ok, input} ->
             Mix.Generator.create_directory("lib/day#{day}")
             Mix.Generator.create_file("lib/day#{day}/input.txt", input)
@@ -54,29 +54,6 @@ defmodule Mix.Tasks.Day.Gen do
 
       _ ->
         Mix.shell().error("Invalid arguments. Usage: mix day.gen <number> <name>")
-    end
-  end
-
-  @doc """
-  Downloads the puzzle input for a given day.
-  """
-  def download_input(day) do
-    HTTPoison.get("https://adventofcode.com/#{@year}/day/#{day}/input", [],
-      hackney: [cookie: ["session=#{System.get_env("AOC_SESSION_COOKIE")}"]],
-      headers: [{"User-Agent", "github.com/Boettner-eric/Advent-of-Code-2025"}]
-    )
-    |> case do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, body}
-
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:error, "Puzzle Not found"}
-
-      {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
-        {:error, body}
-
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, reason}
     end
   end
 

@@ -2,6 +2,7 @@ defmodule AdventOfCode do
   @moduledoc """
   This module contains functions to help with the Advent of Code challenge.
   """
+  @year 2025
 
   @type filename :: :sample | :input | String.t()
 
@@ -33,11 +34,8 @@ defmodule AdventOfCode do
   @spec read_lines(String.t(), filename()) :: list(String.t())
   def read_lines(directory, filename) do
     case File.read(resolve_path(directory, filename)) do
-      {:ok, input} ->
-        String.split(input, "\n", trim: true)
-
-      {:error, reason} ->
-        raise "Error reading file: #{reason}"
+      {:ok, input} -> String.split(input, "\n", trim: true)
+      {:error, reason} -> raise "Error reading file: #{reason}"
     end
   end
 
@@ -54,11 +52,32 @@ defmodule AdventOfCode do
   @spec read_blob(String.t(), filename()) :: String.t()
   def read_blob(directory, filename) do
     case File.read(resolve_path(directory, filename)) do
-      {:ok, input} ->
-        input
+      {:ok, input} -> input
+      {:error, reason} -> raise "Error reading file: #{reason}"
+    end
+  end
 
-      {:error, reason} ->
-        raise "Error reading file: #{reason}"
+  @doc """
+  Downloads the puzzle input for a given day.
+  """
+  @spec download_input(integer()) :: {:ok, String.t()} | {:error, String.t()}
+  def download_input(day) do
+    HTTPoison.get("https://adventofcode.com/#{@year}/day/#{day}/input", [],
+      hackney: [cookie: ["session=#{System.get_env("AOC_SESSION_COOKIE")}"]],
+      headers: [{"User-Agent", "github.com/Boettner-eric/Advent-of-Code-2025"}]
+    )
+    |> case do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, body}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:error, "Puzzle Not found"}
+
+      {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
+        {:error, body}
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, reason}
     end
   end
 end
