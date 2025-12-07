@@ -60,7 +60,7 @@ defmodule AdventOfCode do
   @doc """
   Downloads the puzzle input for a given day.
   """
-  @spec download_input(integer()) :: {:ok, String.t()} | {:error, String.t()}
+  @spec download_input(String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def download_input(day) do
     HTTPoison.get("https://adventofcode.com/#{@year}/day/#{day}/input", [],
       hackney: [cookie: ["session=#{System.get_env("AOC_SESSION_COOKIE")}"]],
