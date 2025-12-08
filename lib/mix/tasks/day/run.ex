@@ -9,14 +9,25 @@ defmodule Mix.Tasks.Day.Run do
 
   @impl Mix.Task
   def run(args) do
-    case OptionParser.parse!(args, strict: []) do
-      {_opts, [day]} ->
+    case OptionParser.parse!(args, strict: [readme: :boolean]) do
+      {opts, [day]} ->
         case find_module(day) do
           {:ok, module} ->
             time_a = run_part(module, :part_one)
             time_b = run_part(module, :part_two)
 
-            Mix.shell().info("Total time: #{format_seconds(time_a + time_b)} seconds")
+            Mix.shell().info("---------------------------------------")
+            Mix.shell().info("Total execution time: #{format_seconds(time_a + time_b)} seconds")
+
+            if opts[:readme] do
+              module_name = String.replace(inspect(module), "Elixir.", "")
+              Mix.shell().info("---------------------------------------")
+              Mix.shell().info("Readme table row:")
+
+              Mix.shell().info(
+                "\n| #{day} | #{module_name} | #{format_seconds(time_a + time_b)}s | ⭐⭐  |\n"
+              )
+            end
 
           {:error, reason} ->
             Mix.shell().error("Module for #{day} not found: #{reason}")
@@ -38,10 +49,15 @@ defmodule Mix.Tasks.Day.Run do
 
   defp run_part(module, function_name) do
     if function_exported?(module, function_name, 1) do
+      module_name = String.replace(inspect(module), "Elixir.", "")
+      Mix.shell().info("---------------------------------------")
+      Mix.shell().info("Running #{module_name} #{function_name}/1:")
+
       {time_us, result} = :timer.tc(fn -> apply(module, function_name, [:input]) end)
 
-      Mix.shell().info("Running #{function_name}/1:\n\n#{inspect(result)}")
-      Mix.shell().info("\nFinished in #{format_seconds(time_us)} seconds\n")
+      Mix.shell().info("\nResult: #{inspect(result)}")
+
+      Mix.shell().info("\nFinished in #{format_seconds(time_us)} seconds")
       time_us
     else
       Mix.shell().error("Function #{function_name}/1 not found in module #{module}")
