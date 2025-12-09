@@ -30,14 +30,14 @@ defmodule MovieTheater do
   end
 
   def max_area2(points) do
-    shape = get_shape(points)
+    edges = get_edges(points)
 
     Enum.reduce(points, {0, nil}, fn i, acc ->
       Enum.reduce(points, acc, fn j, {m, p} ->
         area = area(i, j)
 
         cond do
-          area > m and check_bounds?(shape, i, j) -> {area, {i, j}}
+          area > m and not intersects_any_edges?(edges, i, j) -> {area, {i, j}}
           true -> {m, p}
         end
       end)
@@ -55,17 +55,30 @@ defmodule MovieTheater do
     end)
   end
 
-  def get_shape(points) do
-    # take each pair of points and create the shape
-    Enum.reduce(0..(length(points) - 1), points, fn i, acc ->
+  def get_edges(points) do
+    # take each pair of points and create an edge
+    Enum.reduce(0..(length(points) - 1), [], fn i, acc ->
       {x1, y1} = Enum.at(points, i - 1)
       {x2, y2} = Enum.at(points, i)
 
       cond do
-        x1 == x2 -> Enum.map(min(y1, y2)..max(y1, y2), fn y -> {x1, y} end) ++ acc
-        y1 == y2 -> Enum.map(min(x1, x2)..max(x1, x2), fn x -> {x, y1} end) ++ acc
+        x1 == x2 -> [{{x1, min(y1, y2)}, {x1, max(y1, y2)}}] ++ acc
+        y1 == y2 -> [{{min(x1, x2), y1}, {max(x1, x2), y1}}] ++ acc
       end
     end)
+  end
+
+  def intersects_any_edges?(shape, {x1, y1}, {x2, y2}) do
+    Enum.any?(shape, fn edge ->
+      aabb_intersection?({{x1, y1}, {x2, y2}}, edge)
+    end)
+  end
+
+  defp aabb_intersection?({{x1, y1}, {x2, y2}}, {{a1, b1}, {a2, b2}}) do
+    max(x1, x2) > min(a1, a2) and
+      max(a1, a2) > min(x1, x2) and
+      max(y1, y2) > min(b1, b2) and
+      max(b1, b2) > min(y1, y2)
   end
 
   def area({x, y}, {x1, y1}) do
