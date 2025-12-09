@@ -26,3 +26,4 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 | 6   | TrashCompactor     | 0.6283s        | ⭐⭐  |
 | 7   | Laboratories       | 0.0033s        | ⭐⭐  |
 | 8   | Playground         | 1.1457s        | ⭐⭐  |
+| 9   | MovieTheater       | 124.3317s      | ⭐⭐  |

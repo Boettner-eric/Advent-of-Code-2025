@@ -58,6 +58,71 @@ defmodule AdventOfCode do
   end
 
   @doc """
+  Prints a 2D grid to the console and returns it unaltered
+
+  ## Examples
+
+      iex> AdventOfCode.draw_grid([[1,2,3],[4,5,6],[7,8,9]], " ")
+
+        1 2 3
+        4 5 6
+        7 8 9
+
+  """
+  @spec draw_grid([any()], String.t()) :: [any]
+  def draw_grid(grid, joiner \\ " ") do
+    Enum.reduce(grid, "\n    ", fn row, acc ->
+      acc <> Enum.join(row, joiner) <> "\n    "
+    end)
+    |> IO.puts()
+
+    grid
+  end
+
+  @doc """
+  Print a set of points in a width x height grid
+
+    iex> AdventOfCode.draw_points(points, 12, 8)
+
+      . . . . . . . . . . . . .
+      . . . . . . . * * * * * .
+      . . . . . . . * . . . * .
+      . . * * * * * * . . . * .
+      . . * . . . . . . . . * .
+      . . * * * * * * * * . * .
+      . . . . . . . . . * . * .
+      . . . . . . . . . * * * .
+      . . . . . . . . . . . . .
+
+  """
+  @type coord :: {integer(), integer()}
+  @spec draw_points([coord()], integer(), integer(), String.t()) :: [coord()]
+  def draw_points(points, width, height, symbol \\ "*") do
+    Enum.reduce(0..height, "\n", fn y, acc ->
+      line =
+        Enum.reduce(0..width, "", fn x, bcc ->
+          if {x, y} in points do
+            bcc <> " " <> symbol
+          else
+            bcc <> " ."
+          end
+        end)
+
+      acc <> line <> "\n"
+    end)
+    |> IO.puts()
+
+    points
+  end
+
+  @doc """
+  A simple function to print lists without random charlists
+  """
+  def inspect_list(list) do
+    IO.inspect(list, charlists: :as_lists)
+  end
+
+  @doc """
   Downloads the puzzle input for a given day.
   """
   @spec download_input(String.t()) :: {:ok, String.t()} | {:error, String.t()}
