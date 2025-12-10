@@ -44,17 +44,6 @@ defmodule MovieTheater do
     end)
   end
 
-  def check_bounds?(shape, {x1, y1}, {x2, y2}) do
-    left = min(x1, x2)
-    right = max(x1, x2)
-    bottom = min(y1, y2)
-    top = max(y1, y2)
-
-    not Enum.any?(shape, fn {x, y} ->
-      left < x and x < right and bottom < y and y < top
-    end)
-  end
-
   def get_edges(points) do
     # take each pair of points and create an edge
     Enum.reduce(0..(length(points) - 1), [], fn i, acc ->
