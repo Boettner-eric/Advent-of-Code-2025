@@ -3,7 +3,7 @@ defmodule Factory do
   def part_one(input) do
     AdventOfCode.read_lines(__DIR__, input)
     |> Enum.map(&parse_line/1)
-    |> Enum.reduce(0, fn machine, c -> c + bfs(machine) end)
+    |> Enum.reduce(0, fn machine, c -> c + find_combo(machine) end)
   end
 
   def part_two(input) do
@@ -34,12 +34,12 @@ defmodule Factory do
     {buttons, presses, joltage}
   end
 
-  def bfs({_, presses, _} = machine) do
+  def find_combo({_, presses, _} = machine) do
     queue = PriorityQueue.new() |> PriorityQueue.put(0, Enum.map(presses, fn _ -> 0 end))
-    bfs(queue, machine)
+    find_combo(queue, machine)
   end
 
-  def bfs(queue, {buttons, presses, joltage}) do
+  def find_combo(queue, {buttons, presses, joltage}) do
     {{cost, combo}, queue} = PriorityQueue.pop(queue)
 
     if apply_presses(presses, buttons, combo) == buttons do
@@ -49,17 +49,13 @@ defmodule Factory do
         {0, i}, acc ->
           l = List.replace_at(combo, i, 1)
           # cost is number of presses in this sequence
-          PriorityQueue.put(acc, ones(l), l)
+          PriorityQueue.put(acc, cost + 1, l)
 
         {_, _}, acc ->
           acc
       end)
-      |> bfs({buttons, presses, joltage})
+      |> find_combo({buttons, presses, joltage})
     end
-  end
-
-  def ones(list) do
-    Enum.count(list, fn i -> i == 1 end)
   end
 
   def apply_presses(presses, buttons, combo) do

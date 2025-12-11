@@ -27,3 +27,5 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 | 7   | Laboratories       | 0.0033s        | ⭐⭐  |
 | 8   | Playground         | 1.1457s        | ⭐⭐  |
 | 9   | MovieTheater       | 0.2157s        | ⭐⭐  |
+| 10  | Factory            | 1.6596s        | ⭐   |
+| 11  | Reactor            | 1.5736s        | ⭐⭐  |

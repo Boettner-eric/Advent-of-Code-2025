@@ -2,6 +2,9 @@ defmodule Mix.Tasks.Day.Run do
   @moduledoc """
   Usage: mix day.run <number> < 1 | 2 >
          mix day.run <number> (runs both parts)
+
+  Note: this task starts the whole application so it can load
+  runtime deps (Memoize)
   """
   @shortdoc "Run the code for a given day"
 
@@ -9,6 +12,8 @@ defmodule Mix.Tasks.Day.Run do
 
   @impl Mix.Task
   def run(args) do
+    Mix.Task.run("app.start")
+
     case OptionParser.parse!(args, strict: [readme: :boolean]) do
       {opts, [day]} ->
         case find_module(day) do
