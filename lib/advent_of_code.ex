@@ -85,19 +85,19 @@ defmodule AdventOfCode do
     iex> AdventOfCode.draw_points(points, 12, 8)
 
       . . . . . . . . . . . . .
-      . . . . . . . * * * * * .
-      . . . . . . . * . . . * .
-      . . * * * * * * . . . * .
-      . . * . . . . . . . . * .
-      . . * * * * * * * * . * .
-      . . . . . . . . . * . * .
-      . . . . . . . . . * * * .
+      . . . . . . . X X X X X .
+      . . . . . . . X . . . X .
+      . . X X X X X X . . . X .
+      . . X . . . . . . . . X .
+      . . X X X X X X X X . X .
+      . . . . . . . . . X . X .
+      . . . . . . . . . X X X .
       . . . . . . . . . . . . .
 
   """
   @type coord :: {integer(), integer()}
   @spec draw_points([coord()], integer(), integer(), String.t()) :: [coord()]
-  def draw_points(points, width, height, symbol \\ "*") do
+  def draw_points(points, width, height, symbol \\ "X") do
     Enum.reduce(0..height, "\n", fn y, acc ->
       line =
         Enum.reduce(0..width, "", fn x, bcc ->
@@ -128,6 +128,30 @@ defmodule AdventOfCode do
   @spec download_input(String.t()) :: {:ok, String.t()} | {:error, String.t()}
   def download_input(day) do
     HTTPoison.get("https://adventofcode.com/#{@year}/day/#{day}/input", [],
+      hackney: [cookie: ["session=#{System.get_env("AOC_SESSION_COOKIE")}"]],
+      headers: [{"User-Agent", "github.com/Boettner-eric/Advent-of-Code-2025"}]
+    )
+    |> case do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, body}
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        {:error, "Puzzle Not found"}
+
+      {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
+        {:error, body}
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+
+  @doc """
+  Downloads the html to parse for a given day
+  """
+  @spec download_day(String.t()) :: {:ok, String.t()} | {:error, String.t()}
+  def download_day(day) do
+    HTTPoison.get("https://adventofcode.com/#{@year}/day/#{day}", [],
       hackney: [cookie: ["session=#{System.get_env("AOC_SESSION_COOKIE")}"]],
       headers: [{"User-Agent", "github.com/Boettner-eric/Advent-of-Code-2025"}]
     )

@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Day.Gen do
   @moduledoc """
-  Usage: mix day.gen <number> <module_name | "download">
+  Usage: mix day.gen <number>
+         mix day.gen <number> download
   """
   @shortdoc "Generates all the files needed for an aoc day"
 
@@ -14,46 +15,44 @@ defmodule Mix.Tasks.Day.Gen do
 
     case OptionParser.parse!(args, strict: []) do
       {_opts, [day, "download"]} ->
-        if not File.exists?("lib/day#{day}/input.txt") or
-             Mix.shell().yes?("Input file already exists. Overwrite? (y/n)") do
-          case AdventOfCode.download_input(day) do
-            {:ok, input} ->
-              Mix.Generator.create_file("lib/day#{day}/input.txt", input)
-              Mix.shell().info("Input downloaded and saved to lib/day#{day}/input.txt")
-
-            {:error, reason} ->
-              Mix.shell().error("Error downloading puzzle: #{reason}")
-          end
+        with {:ok, input} <- AdventOfCode.download_input(day),
+             {:ok, html} <- AdventOfCode.download_day(day),
+             {:ok, _, sample} = parse_day(html) do
+          Mix.Generator.create_file("lib/day#{day}/input.txt", input)
+          Mix.Generator.create_file("lib/day#{day}/sample.txt", sample)
         else
-          Mix.shell().info("Input file already exists. Skipping download.")
+          {:error, reason} -> Mix.shell().error("Error downloading puzzle: #{reason}")
         end
 
-      {_opts, [day, name]} ->
-        file_name = String.split(name, ~r/(?=[A-Z])/, trim: true) |> Enum.join("_")
-        file_name = "lib/day#{day}/#{String.downcase(file_name)}.ex"
+      {_opts, [day]} ->
+        with {:ok, input} <- AdventOfCode.download_input(day),
+             {:ok, html} <- AdventOfCode.download_day(day),
+             {:ok, name, sample} = parse_day(html) do
+          day_name = num_to_name(day)
+          test_file_name = "test/days/day_#{String.replace(day_name, " ", "_")}_test.exs"
+          file_name = "lib/day#{day}/#{String.downcase(Enum.join(name, "_"))}.ex"
 
-        module_name =
-          String.split(name, ~r/(?=[A-Z])/, trim: true)
-          |> Enum.map(&String.capitalize(&1))
-          |> Enum.join("")
-
-        day_name = num_to_name(day)
-        test_file_name = "test/days/day_#{String.replace(day_name, " ", "_")}_test.exs"
-
-        case AdventOfCode.download_input(day) do
-          {:ok, input} ->
-            Mix.Generator.create_directory("lib/day#{day}")
-            Mix.Generator.create_file("lib/day#{day}/input.txt", input)
-            Mix.Generator.create_file("lib/day#{day}/sample.txt", "")
-            Mix.Generator.create_file(file_name, template_day(module_name, day))
-            Mix.Generator.create_file(test_file_name, template_test(module_name, day_name))
-
-          {:error, reason} ->
-            Mix.shell().error("Error downloading puzzle: #{reason}")
+          Mix.Generator.create_directory("lib/day#{day}")
+          Mix.Generator.create_file("lib/day#{day}/input.txt", input)
+          Mix.Generator.create_file("lib/day#{day}/sample.txt", sample)
+          Mix.Generator.create_file(file_name, template_day(Enum.join(name, ""), day))
+          Mix.Generator.create_file(test_file_name, template_test(Enum.join(name, ""), day_name))
+        else
+          {:error, reason} -> Mix.shell().error("Error generating day: #{reason}")
         end
 
       _ ->
         Mix.shell().error("Invalid arguments. Usage: mix day.gen <number> <name>")
+    end
+  end
+
+  defp parse_day(html) do
+    with {:ok, document} <- Floki.parse_document(html),
+         [{"code", [], sample} | _] <- Floki.find(document, "pre code"),
+         [{"h2", [], [title]} | _] <- Floki.find(document, "main article h2") do
+      {:ok, String.split(title, " ") |> Enum.slice(3..-2//1), sample}
+    else
+      _ -> {:error, "couldn't parse html"}
     end
   end
 
