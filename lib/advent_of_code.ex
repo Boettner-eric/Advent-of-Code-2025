@@ -33,8 +33,11 @@ defmodule AdventOfCode do
   """
   @spec read_lines(String.t(), filename()) :: list(String.t())
   def read_lines(directory, filename) do
+    day = Path.basename(directory) |> String.split("day", trim: true) |> Enum.at(0, "X")
+
     case File.read(resolve_path(directory, filename)) do
       {:ok, input} -> String.split(input, "\n", trim: true)
+      {:error, :enoent} -> raise "Input Missing: Try running 'mix day.gen #{day} download'"
       {:error, reason} -> raise "Error reading file: #{reason}"
     end
   end
@@ -51,8 +54,11 @@ defmodule AdventOfCode do
   """
   @spec read_blob(String.t(), filename()) :: String.t()
   def read_blob(directory, filename) do
+    day = Path.basename(directory) |> String.split("day", trim: true) |> Enum.at(0, "X")
+
     case File.read(resolve_path(directory, filename)) do
       {:ok, input} -> input
+      {:error, :enoent} -> raise "Input Missing: Try running 'mix day.gen #{day} download'"
       {:error, reason} -> raise "Error reading file: #{reason}"
     end
   end
