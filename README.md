@@ -20,9 +20,9 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 | Day | Module Name        | Execution time | Stars |
 | --- | ------------------ | -------------- | ----- |
 | 1   | SecretEntrance     | 0.0134s        | ⭐⭐  |
-| 2   | GiftShop           | 2.9177s        | ⭐⭐  |
+| 2   | GiftShop           | 0.2071s        | ⭐⭐  |
 | 3   | Lobby              | 0.0042s        | ⭐⭐  |
-| 4   | PrintingDepartment | 1.2598s        | ⭐⭐  |
+| 4   | PrintingDepartment | 0.2488s        | ⭐⭐  |
 | 5   | Cafeteria          | 0.1331s        | ⭐⭐  |
 | 6   | TrashCompactor     | 0.6283s        | ⭐⭐  |
 | 7   | Laboratories       | 0.0033s        | ⭐⭐  |

@@ -2,37 +2,38 @@ defmodule PrintingDepartment do
   # https://adventofcode.com/2025/day/4
   def part_one(input) do
     AdventOfCode.read_lines(__DIR__, input)
-    |> Enum.reduce([], fn line, acc ->
-      acc ++ [String.split(line, "", trim: true)]
-    end)
+    |> parse_lines()
     |> find_tp()
     |> length()
   end
 
   def part_two(input) do
     AdventOfCode.read_lines(__DIR__, input)
-    |> Enum.reduce([], fn line, acc ->
-      acc ++ [String.split(line, "", trim: true)]
-    end)
+    |> parse_lines()
     |> loop(0, [])
+  end
+
+  def parse_lines(lines) do
+    Enum.reduce(Enum.with_index(lines), %{}, fn {line, y}, acc ->
+      String.split(line, "")
+      |> Enum.with_index()
+      |> Enum.reduce(acc, fn {val, x}, map ->
+        Map.put(map, {x, y}, val)
+      end)
+    end)
   end
 
   def loop(graph, 0, []), do: loop(graph, 0, find_tp(graph))
   def loop(_graph, tp, []), do: tp
 
   def loop(graph, tp, points) do
-    tp = tp + length(points)
     graph = remove_points(graph, points)
-    loop(graph, tp, find_tp(graph))
+    loop(graph, tp + length(points), find_tp(graph))
   end
 
   def find_tp(graph) do
-    Enum.reduce(0..(length(graph) - 1), [], fn y, tp ->
-      row = Enum.at(graph, y, [])
-
-      Enum.reduce(0..(length(row) - 1), tp, fn x, tps ->
-        if Enum.at(row, x) == "@", do: adjacent_tp(graph, x, y) ++ tps, else: tps
-      end)
+    Enum.reduce(graph, [], fn {{x, y}, val}, tp ->
+      if val == "@", do: adjacent_tp(graph, x, y) ++ tp, else: tp
     end)
   end
 
@@ -47,13 +48,9 @@ defmodule PrintingDepartment do
       {i + 1, j + 1},
       {i + 1, j}
     ]
-    |> Enum.filter(fn {x, y} ->
-      if y >= 0 and y <= length(graph) - 1 do
-        row = Enum.at(graph, y, [])
-        x >= 0 and x <= length(row) - 1 and Enum.at(row, x) == "@"
-      end
+    |> Enum.count(fn {x, y} ->
+      Map.get(graph, {x, y}) == "@"
     end)
-    |> length()
     |> case do
       k when k < 4 -> [{i, j}]
       _ -> []
@@ -62,9 +59,7 @@ defmodule PrintingDepartment do
 
   def remove_points(graph, points) do
     Enum.reduce(points, graph, fn {x, y}, g ->
-      List.update_at(g, y, fn row ->
-        List.replace_at(row, x, ".")
-      end)
+      Map.put(g, {x, y}, ".")
     end)
   end
 end

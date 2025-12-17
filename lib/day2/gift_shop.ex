@@ -4,26 +4,26 @@ defmodule GiftShop do
     AdventOfCode.read_lines(__DIR__, input)
     |> Enum.at(0)
     |> String.split(",", trim: true)
-    |> Enum.reduce(0, fn i, count ->
+    |> Task.async_stream(fn i ->
       [first, last] = String.split(i, "-", trim: true)
 
       String.to_integer(first)..String.to_integer(last)
-      |> Enum.to_list()
-      |> Enum.reduce(count, &symmetric/2)
+      |> Enum.reduce(0, &symmetric/2)
     end)
+    |> Enum.reduce(0, fn {:ok, c}, count -> c + count end)
   end
 
   def part_two(input) do
     AdventOfCode.read_lines(__DIR__, input)
     |> Enum.at(0)
     |> String.split(",", trim: true)
-    |> Enum.reduce(0, fn i, count ->
+    |> Task.async_stream(fn i ->
       [first, last] = String.split(i, "-", trim: true)
 
       String.to_integer(first)..String.to_integer(last)
-      |> Enum.to_list()
-      |> Enum.reduce(count, &symmetric_two/2)
+      |> Enum.reduce(0, &symmetric_two/2)
     end)
+    |> Enum.reduce(0, fn {:ok, c}, count -> c + count end)
   end
 
   def symmetric(number, matches) do
@@ -37,29 +37,29 @@ defmodule GiftShop do
 
   def symmetric_two(number, matches) do
     num = Integer.to_string(number)
-    size = String.length(num)
+    size = byte_size(num)
 
-    Enum.reduce_while(2..size, matches, fn parts, count ->
-      if size > 1 and rem(size, parts) == 0 and equal_parts(num, parts) do
-        {:halt, number + count}
+    Enum.reduce_while(size..2//-1, matches, fn parts, count ->
+      if rem(size, parts) == 0 and equal_parts(num, div(size, parts)) do
+        {:halt, count + number}
       else
         {:cont, count}
       end
     end)
   end
 
-  def equal_parts(str, parts) do
-    part_length = div(String.length(str), parts)
+  defp equal_parts(str, size, pattern \\ nil)
+  defp equal_parts(<<>>, _size, _pattern), do: true
 
-    Enum.reduce_while(0..(parts - 1), nil, fn part, current ->
-      offset = part * part_length
-      slice = String.slice(str, offset..(offset + part_length - 1))
+  defp equal_parts(str, size, nil) do
+    <<part::binary-size(size), rest::binary>> = str
 
-      cond do
-        is_nil(current) -> {:cont, slice}
-        current == slice -> {:cont, current}
-        true -> {:halt, false}
-      end
-    end)
+    equal_parts(rest, size, part)
+  end
+
+  defp equal_parts(str, size, pattern) when byte_size(str) >= size do
+    <<part::binary-size(size), rest::binary>> = str
+
+    part == pattern and equal_parts(rest, size, part)
   end
 end
