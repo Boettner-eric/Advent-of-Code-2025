@@ -14,6 +14,7 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 - no AI use
 - solve most of the problems
 - optimize slower solutions
+- get solutions under 1s
 
 ## Results
 
@@ -26,7 +27,7 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 | 5   | Cafeteria          | 0.1331s        | ⭐⭐  |
 | 6   | TrashCompactor     | 0.6283s        | ⭐⭐  |
 | 7   | Laboratories       | 0.0033s        | ⭐⭐  |
-| 8   | Playground         | 1.1457s        | ⭐⭐  |
+| 8   | Playground         | 0.5967s        | ⭐⭐  |
 | 9   | MovieTheater       | 0.2157s        | ⭐⭐  |
 | 10  | Factory            | 0.3789s        | ⭐⭐  |
 | 11  | Reactor            | 1.5736s        | ⭐⭐  |

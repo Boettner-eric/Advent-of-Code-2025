@@ -18,25 +18,20 @@ defmodule Playground do
 
   def parse_input(input) do
     Enum.map(input, fn line ->
-      String.split(line, ",") |> Enum.map(&String.to_integer/1)
+      String.split(line, ",") |> Enum.map(&String.to_integer/1) |> List.to_tuple()
     end)
   end
 
   def find_edges(nodes) do
-    Enum.reduce(nodes, [], fn i, acc ->
-      Enum.reduce(nodes, acc, fn j, bcc ->
-        case euclidean_distance(i, j) do
-          0 -> bcc
-          dist -> [{{i, j}, dist} | bcc]
-        end
-      end)
+    Enum.flat_map(Enum.with_index(nodes), fn {i, idx_i} ->
+      Enum.drop(nodes, idx_i + 1)
+      |> Enum.map(fn j -> {{i, j}, euclidean_distance(i, j)} end)
     end)
-    |> Enum.uniq_by(fn {{a, b}, _} -> Enum.sort([a, b]) end)
-    |> Enum.sort_by(fn {_, c} -> c end)
+    |> Enum.sort_by(fn {_, dist} -> dist end)
   end
 
   # https://en.wikipedia.org/wiki/Euclidean_distance
-  def euclidean_distance([p1, p2, p3], [q1, q2, q3]) do
+  def euclidean_distance({p1, p2, p3}, {q1, q2, q3}) do
     :math.sqrt(:math.pow(p1 - q1, 2) + :math.pow(p2 - q2, 2) + :math.pow(p3 - q3, 2)) |> round()
   end
 
@@ -47,7 +42,6 @@ defmodule Playground do
     |> Enum.reduce(1, fn circuit, product -> MapSet.size(circuit) * product end)
   end
 
-  # use MapSets to store each circuit for easy lookup / merging
   def find_circuits([edge | edges], circuits, target) do
     {{a, b}, _cost} = edge
     circuit_a = find_node(circuits, a)
@@ -60,7 +54,7 @@ defmodule Playground do
       circuits = merge_circuits(circuits, circuit_a, circuit_b)
 
       if all_connected?(circuits, target) do
-        Enum.at(a, 0) * Enum.at(b, 0)
+        elem(a, 0) * elem(b, 0)
       else
         find_circuits(edges, circuits, target)
       end
