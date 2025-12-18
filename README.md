@@ -30,7 +30,7 @@ This is my attempt at the [Advent of Code 2025](https://adventofcode.com/2025) c
 | 8   | Playground         | 0.5967s        | ⭐⭐  |
 | 9   | MovieTheater       | 0.2157s        | ⭐⭐  |
 | 10  | Factory            | 0.3789s        | ⭐⭐  |
-| 11  | Reactor            | 1.5736s        | ⭐⭐  |
+| 11  | Reactor            | 0.7212s        | ⭐⭐  |
 | 12  | ChristmasTreeFarm  | 0.0013s        | ⭐⭐  |
 
 ## Reflection
