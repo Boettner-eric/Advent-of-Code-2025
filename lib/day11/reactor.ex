@@ -7,6 +7,12 @@ defmodule Reactor do
     |> find_out(:you)
   end
 
+  def part_two(:sample) do
+    AdventOfCode.read_lines(__DIR__, "sample2.txt")
+    |> Enum.reduce(%{}, &parse_line/2)
+    |> find_out(:svr, [:fft, :dac])
+  end
+
   def part_two(input) do
     AdventOfCode.read_lines(__DIR__, input)
     |> Enum.reduce(%{}, &parse_line/2)

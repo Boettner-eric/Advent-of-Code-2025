@@ -12,7 +12,7 @@ defmodule ReactorTest do
 
   @tag :sample
   test "day eleven, gets correct answer for part two with the sample input" do
-    assert Reactor.part_two("sample2.txt") == 2
+    assert Reactor.part_two(:sample) == 2
   end
 
   test "day eleven, gets correct answer for part two" do
