@@ -81,9 +81,10 @@ defmodule Mix.Tasks.Day.Run do
         {time_b, _} = run_part(module, :part_two, input, false)
 
         module_name = String.replace(inspect(module), "Elixir.", "")
+        sample = if input == :sample, do: "(sample)", else: ""
 
         Mix.shell().info(
-          "| #{String.pad_trailing(inspect(day), 2)} | #{String.pad_trailing(module_name, 20)} | #{format_seconds(time_a + time_b)}s |"
+          "| #{String.pad_trailing(inspect(day), 2)} | #{String.pad_trailing(module_name, 20)} #{String.pad_trailing(sample, 8)} | #{format_seconds(time_a + time_b)}s |"
         )
 
       {:error, reason} ->
